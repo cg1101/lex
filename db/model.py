@@ -77,12 +77,11 @@ class KeyMap(object):
 	def get_map(klass):
 		if klass._singleton is None:
 			s = klass._singleton = super(KeyMap, klass).__new__(klass)
-		s._key_map = {}
-		s._runtime_map = {}
-		for symbol in Symbol.query.filter(Symbol.appenKey!=None).all():
-			s._key_map[s.appenKey] = s.key
+			s._key_map = {}
+			s._runtime_map = {}
+			for symbol in Symbol.query.filter(Symbol.appenKey!=None).all():
+				s._key_map[symbol.appenKey] = symbol.key
 		return klass._singleton
-	@classmethod
 	def get_key(self, raw_ipa_id):
 		ipa_id = raw_ipa_id
 		if ipa_id.endswith(';0'):
@@ -153,14 +152,9 @@ class Grapheme(Base):
 	@property
 	def key(self):
 		if getattr(self, '_phone_key', None) is None:
-			print 'haha'
 			m = KeyMap.get_map()
-			print m
-			return 'x'
 			key = KeyMap.get_map().get_key(self.appenKey)
-			return 'a'
 			setattr(self, '_phone_key', key)
-		return 'blahblah'
 		if isinstance(self._phone_key, list):
 			return ''.join(self._phone_key)
 		return self._phone_key
