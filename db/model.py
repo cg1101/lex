@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -127,17 +126,26 @@ class Alphabet(Base):
 	__table__ = t_phonetic_alphabet
 	dialect = relationship('Dialect')
 	graphemes = relationship('Grapheme', backref='alphabet')
+	phonologyRules = relationship('PhonologyRule')
+	stressRules = relationship('StressRule')
+	syllabificationRules = relationship('SyllabificationRule')
+	vowelisationRules = relationship('VowelisationRule')
 
 class AlphabetSchema(Schema):
 	dialect = fields.Nested('DialectSchema', exclude=('dialectId',))
 	graphemes = fields.Nested('GraphemeSchema', many=True, exclude=('alphabetId',))
+	phonologyRules = fields.Nested('PhonologyRuleSchema', many=True, exclude=('alphabetId',))
+	stressRules = fields.Nested('StressRuleSchema', many=True, exclude=('alphabetId',))
+	syllabificationRules = fields.Nested('SyllabificationRuleSchema', many=True, exclude=('alphabetId',))
+	vowelisationRules = fields.Nested('VowelisationRuleSchema', many=True, exclude=('alphabetId',))
 	class Meta:
 		fields = ('alphabetId', 'name', 'manPageUrl', 'current', 'dialectId')
 
 class Alphabet_FullSchema(AlphabetSchema):
 	class Meta:
 		fields = ('alphabetId', 'name', 'manPageUrl', 'current', 'dialectId',
-			'dialect', 'graphemes')
+			'dialect', 'graphemes',
+			'phonologyRules', 'stressRules', 'syllabificationRules', 'vowelisationRules')
 
 
 # Grapheme

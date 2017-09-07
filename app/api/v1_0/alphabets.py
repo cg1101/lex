@@ -17,7 +17,6 @@ def get_alphabets():
 	returns a list of matched alphabets
 	'''
 	alphabets = m.Alphabet.query.all()
-	rs = m.Alphabet.dump(alphabets)
 	return jsonify(alphabets=m.Alphabet.dump(alphabets))
 
 

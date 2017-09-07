@@ -16,3 +16,4 @@ import alphabets
 import projects
 import tasks
 import dialects
+import symbols

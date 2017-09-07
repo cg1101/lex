@@ -17,7 +17,6 @@ def get_projects():
 	returns a list of matched projects
 	'''
 	projects = m.Project.query.all()
-	rs = m.Project.dump(projects)
 	return jsonify(projects=m.Project.dump(projects))
 
 

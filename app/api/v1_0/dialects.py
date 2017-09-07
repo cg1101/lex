@@ -17,7 +17,6 @@ def get_dialects():
 	returns a list of matched dialects
 	'''
 	dialects = m.Dialect.query.all()
-	rs = m.Dialect.dump(dialects)
 	return jsonify(dialects=m.Dialect.dump(dialects))
 
 
