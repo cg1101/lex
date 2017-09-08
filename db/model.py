@@ -166,18 +166,11 @@ class Grapheme(Base):
 		if isinstance(self._phone_key, list):
 			return ''.join(self._phone_key)
 		return self._phone_key
-	@property
-	def sampa(self):
-		return ''
-		# if getattr(self, '_phone', None) == None:
-		# 	phone = AppLinguist.lookup(self.appenKey)
-		# 	setattr(self, '_phone', phone)
-		# return self._phone.sampa
 
 class GraphemeSchema(Schema):
 	class Meta:
-		fields = ('graphemeId', 'alphabetId', 'key', 'appenKey',
-			'appenSampa', 'orthography', 'romanization',
+		fields = ('graphemeId', 'alphabetId', 'appenKey',
+			'sampa', 'orthography', 'romanization',
 			'exampleWord', 'exampleTranscription', 'exampleRomanization')
 
 

@@ -33,7 +33,7 @@ t_phonetic_graphemes = sa.Table('phonetic_graphemes', metadata,
 	sa.Column('phonetic_grapheme_id', INTEGER, primary_key=True, autoincrement=True, key=u'graphemeId', doc=''),
 	sa.Column('ipa_id', TEXT, nullable=False, key=u'appenKey', doc=''),
 	sa.Column('alphabet_id', INTEGER, sa.ForeignKey('phonetic_alphabet.alphabetId'), nullable=False, key=u'alphabetId', doc=''),
-	sa.Column('grapheme', TEXT, nullable=False, key=u'appenSampa', doc=''),
+	sa.Column('grapheme', TEXT, nullable=False, key=u'sampa', doc=''),
 	sa.Column('orthography', TEXT, nullable=True, key=u'orthography', doc=''),
 	sa.Column('romanised_form', TEXT, nullable=True, key=u'romanization', doc=''),
 )
