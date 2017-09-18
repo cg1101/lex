@@ -4,3 +4,4 @@
 /venv/*
 /setenv.sh
 /app/static
+/app/index.html

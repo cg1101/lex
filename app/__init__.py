@@ -17,7 +17,7 @@ from db import database as db
 
 
 def create_app(config_name):
-	app = Flask(__name__, static_url_path='/src')
+	app = Flask(__name__)
 	app.config.from_object(config[config_name])
 	config[config_name].init_app(app)
 	db.init_app(app)
@@ -129,8 +129,7 @@ def create_app(config_name):
 
 	@app.route('/')
 	def index():
-		fpath = os.path.join(os.path.dirname(__file__), 'static/html/index.html')
-		print fpath
+		fpath = os.path.join(os.path.dirname(__file__), 'index.html')
 		return send_file(fpath)
 
 	return app
