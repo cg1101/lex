@@ -5,7 +5,7 @@ class Config:
 	SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 	SQLALCHEMY_DATABASE_URI = (os.environ.get('DATABASE_URI')
-			or 'postgresql://localhost/appenlex')
+			or 'postgresql://dbserver/appenlex')
 	@staticmethod
 	def init_app(app):
 		pass

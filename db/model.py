@@ -275,6 +275,11 @@ class Task(Base):
 		primaryjoin='Task.taskId==TaskTag.taskId',
 		secondaryjoin='TaskTag.tagId==Tag.tagId',
 	)
+	words = relationship('Word', lazy=True,
+		secondary='word_task_map',
+		primaryjoin='Task.taskId==TaskWord.taskId',
+		secondaryjoin='TaskWord.wordId==Word.wordId',
+	)
 	imports = relationship('ImportedFile', lazy=True)
 	exports = relationship('ExportedFile', lazy=True)
 
@@ -292,6 +297,9 @@ class TagSchema(Schema):
 
 class TaskTag(Base):
 	__table__ = t_tag_task_map
+
+class TaskWord(Base):
+	__table__ = t_word_task_map
 
 class ImportedFile(Base):
 	__table__ = t_task_lexicon_import_map
@@ -312,6 +320,10 @@ class Suprasegmental(Base):
 
 class Vowel(Base):
 	__table__ = t_vowel_description
+
+class Word(Base):
+	__table__ = t_word
+
 
 '''
 
