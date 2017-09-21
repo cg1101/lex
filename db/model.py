@@ -270,11 +270,48 @@ class Task(Base):
 	_taskType = relationship('TaskType')
 	taskType = association_proxy('_taskType', 'name')
 	alphabet = relationship('Alphabet')
+	tags = relationship('Tag', lazy=True,
+		secondary='tag_task_map',
+		primaryjoin='Task.taskId==TaskTag.taskId',
+		secondaryjoin='TaskTag.tagId==Tag.tagId',
+	)
+	imports = relationship('ImportedFile', lazy=True)
+	exports = relationship('ExportedFile', lazy=True)
 
 class TaskSchema(Schema):
 	class Meta:
 		fields = ('taskId', 'name', 'projectId', 'taskTypeId', 'taskType',
 			'alphabetId', 'url', 'conventionsUrl', 'hasSecondHeadword')
+
+class Tag(Base):
+	__table__ = t_tag
+
+class TagSchema(Schema):
+	class Meta:
+		fields = ('tagId', 'name')
+
+class TaskTag(Base):
+	__table__ = t_tag_task_map
+
+class ImportedFile(Base):
+	__table__ = t_task_lexicon_import_map
+	data = deferred(t_task_lexicon_import_map.c.data)
+
+class ExportedFile(Base):
+	__table__ = t_task_lexicon_export_map
+	data = deferred(t_task_lexicon_export_map.c.data)
+
+class Consonant(Base):
+	__table__ = t_consonant_description
+
+class Diacritic(Base):
+	__table__ = t_diacritic_description
+
+class Suprasegmental(Base):
+	__table__ = t_suprasegmental_description
+
+class Vowel(Base):
+	__table__ = t_vowel_description
 
 '''
 
