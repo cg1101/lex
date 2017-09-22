@@ -6,7 +6,7 @@ import traceback
 from functools import wraps
 from types import NoneType, BooleanType, IntType, StringType, DictType
 
-from flask import Response, request, make_response, jsonify, current_app, session
+from flask import Response, request, make_response, jsonify, current_app, g
 from werkzeug.exceptions import HTTPException
 from werkzeug.datastructures import CombinedMultiDict, FileStorage
 
@@ -80,7 +80,7 @@ def caps(*caps):
 	def customized_decorator(fn):
 		@wraps(fn)
 		def decorated(*args, **kwargs):
-			user = session['current_user']
+			user = g.current_user
 			missing = set(caps) - set(getattr(user, 'caps', set()))
 			if missing:
 				raise InvalidUsage(

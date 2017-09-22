@@ -1,19 +1,16 @@
 #!/usr/bin/env python
 
 import os
-import re
 
-from flask import Flask, session, request, after_this_request,\
-		redirect, jsonify, make_response, url_for, current_app, g,\
-		send_file
+from flask import Flask, request, g, redirect, jsonify, make_response,\
+	send_file, after_this_request
 from flask_cors import CORS
 
 from config import config
-import db.model as m
 from db.db import SS
+import db.model as m
 from db import database as db
-# from .auth import MyAuthMiddleWare
-# from .i18n import get_text as _
+from .auth import MyAuthMiddleWare
 
 
 def create_app(config_name):
@@ -24,96 +21,32 @@ def create_app(config_name):
 
 	CORS(app, resources={'/api/1.0/*': {'origins': '*'}})
 
-	# app.wsgi_app = MyAuthMiddleWare(app.wsgi_app,
-	# 	app.config['AUTHENTICATION_LOGIN_URL'],
-	# 	public_prefixes=['/static/', '/webservices', '/logout'],
-	# 	json_prefixes=['/api/'],
-	# )
-
-	# public_url_patterns = map(re.compile, [
-	# 	'/static/',
-	# 	'/favicon.ico',
-	# 	'/edm',
-	# 	'/webservices',
-	# 	'/logout',
-	# 	'/authorization_response',
-	# 	'/health-check',
-	# ])
-	# json_url_patterns = map(re.compile, [
-	# 	'/whoami',
-	# 	'/api'
-	# ])
+	app.wsgi_app = MyAuthMiddleWare(app.wsgi_app,
+		app.config['AUTHENTICATION_LOGIN_URL'],
+		public_prefixes=[
+			'/static/',
+			'/favicon.ico',
+			'/health-check',
+			'/logout'],
+		json_prefixes=['/api/', '/whoami'],
+	)
 
 	from app.api import api_1_0
-	# from app.edm import edm
-	# from app.tagimages import tagimages
-	# from app.webservices import webservices
-	# from app.views import views
 	app.register_blueprint(api_1_0, url_prefix='/api/1.0/')
-	# app.register_blueprint(edm, url_prefix='/edm')
-	# app.register_blueprint(tagimages, url_prefix='/tagimages')
-	# app.register_blueprint(webservices, url_prefix='/webservices')
-	# app.register_blueprint(views, url_prefix='')
 
-	# @app.before_request
-	# def get_current_user():
-	# 	data = request.environ.get('myauthmiddleware', None)
-	# 	if not data:
-	# 		user = User.query.get(699)
+	@app.before_request
+	def set_current_user():
+		data = request.environ.get('myauthmiddleware', None)
+		userId = int(data['REMOTE_USER_ID'])
+		g.current_user = m.User.query.get(699)
+
+	# @app.teardown_request
+	# def terminate_transaction(exception):
+	# 	if exception is None:
+	# 		SS.commit()
 	# 	else:
-	# 		user = User.query.get(data['REMOTE_USER_ID'])
-	# 		session['current_user'] = user
-
-	# @app.after_request
-	# def set_cookie_if_necessary(resp):
-	# 	if g.get('update_cookie', False):
-	# 		current_app.logger.debug('trying to set cookie as instructed')
-	# 		try:
-	# 			me = session['current_user']
-	# 			caps = session['current_user_caps']
-	# 			user_type = session['current_user_type']
-	# 			roles = session['current_user_roles']
-	# 			data = {
-	# 				'REMOTE_USER_ID': me.userId,
-	# 				'REMOTE_USER_NAME': me.userName,
-	# 				'CAPABILITIES': caps,
-	# 				'USER_TYPE': user_type,
-	# 				'ROLES': roles,
-	# 			}
-	# 			value = auth.encode_cookie(data,
-	# 				current_app.config['APP_COOKIE_SECRET'], timeout=0)
-	# 			resp.set_cookie(current_app.config['APP_COOKIE_NAME'], value)
-	# 		except Exception, e:
-	# 			current_app.logger.debug('error setting cookie {}'.format(e))
-	# 			pass
-	# 	session['current_user'] = None
-	# 	return resp
-
-	# @app.route('/whoami')
-	# def who_am_i():
-	# 	me = session['current_user']
-	# 	ao_url = util.tiger.get_url_root().replace('global', 'online')
-	# 	if ao_url.endswith('online.appen.com'):
-	# 		ao_url = ao_url.replace('/online.appen.com', '/appenonline.appen.com.au')
-	# 	resp = jsonify(
-	# 		user=m.User.dump(me, use='full'),
-	# 		caps=session['current_user_caps'],
-	# 		userType=session['current_user_type'],
-	# 		roles=session['current_user_roles'],
-	# 		runtimeEnvironment={
-	# 			'tiger': util.tiger.get_url_root(),
-	# 			'edm': util.edm.get_url_root(),
-	# 			'go': util.go.get_url_root(),
-	# 			'ao': ao_url,
-	# 		}
-	# 	)
-	# 	resp.headers['Cache-Control'] = 'max-age=0, must-revalidate'
-	# 	return resp
-
-
-	@app.route('/health-check')
-	def health_check():
-		return make_response('OK', 200, {'Content-Type': 'text/plain'})
+	# 		SS.rollback()
+	# 	SS.remove()
 
 	# @app.errorhandler(404)
 	# def default_hander(exc):
@@ -126,6 +59,25 @@ def create_app(config_name):
 	# 			404, {})
 	# 	# TODO: only redirect valid urls
 	# 	return redirect('/#%s' % request.path)
+
+	@app.route('/whoami')
+	def who_am_i():
+		me = g.current_user
+		resp = jsonify(user=m.User.dump(me))
+		resp.headers['Cache-Control'] = 'max-age=0, must-revalidate'
+		return resp
+
+	@app.route('/health-check')
+	def health_check():
+		return make_response('OK', 200, {'Content-Type': 'text/plain'})
+
+	@app.route('/logout')
+	def logout():
+		@after_this_request
+		def clear_cookie(resp):
+			resp.set_cookie(current_app.config['APP_COOKIE_NAME'])
+			return resp
+		return redirect(app.config['AUTHENTICATION_LOGIN_URL'])
 
 	@app.route('/')
 	def index():

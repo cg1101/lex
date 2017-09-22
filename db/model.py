@@ -255,6 +255,10 @@ class VowelisationRuleSequenceSchema(Schema):
 		fields = ('ruleId', 'sequenceId', 'correct', 'incorrect')
 
 
+class User(Base):
+	__table__ = t_users
+
+
 class Project(Base):
 	__table__ = t_project
 
@@ -324,18 +328,6 @@ class Vowel(Base):
 class Word(Base):
 	__table__ = t_word
 
-
-'''
-
-import json, db.model as m
-
-print json.dumps( m.WritingScript.dump(m.WritingScript.query.all()), indent=2)
-print json.dumps( m.Dialect.dump( m.Dialect.query.all()), indent=2)
-print json.dumps( m.Alphabet.dump( m.Alphabet.query.all()), indent=2)
-
-print json.dumps( m.Grapheme.dump( m.Grapheme.query.filter_by( alphabetId=23).all() ), indent=2)
-
-'''
 
 ##########################################################################
 #
