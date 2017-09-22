@@ -37,8 +37,10 @@ def create_app(config_name):
 	@app.before_request
 	def set_current_user():
 		data = request.environ.get('myauthmiddleware', None)
-		userId = int(data['REMOTE_USER_ID'])
-		g.current_user = m.User.query.get(699)
+		g.current_user = None
+		if data:
+			userId = int(data['REMOTE_USER_ID'])
+			g.current_user = m.User.query.get(userId)
 
 	# @app.teardown_request
 	# def terminate_transaction(exception):
