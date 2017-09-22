@@ -3,7 +3,7 @@
 import os
 
 from flask import Flask, request, g, redirect, jsonify, make_response,\
-	send_file, after_this_request
+	send_file, current_app, after_this_request
 from flask_cors import CORS
 
 from config import config
