@@ -3,7 +3,7 @@
 import os
 
 from flask import Flask, request, g, redirect, jsonify, make_response,\
-	send_file, current_app, after_this_request
+	send_file, after_this_request
 from flask_cors import CORS
 
 from config import config
@@ -77,7 +77,7 @@ def create_app(config_name):
 	def logout():
 		@after_this_request
 		def clear_cookie(resp):
-			resp.set_cookie(current_app.config['APP_COOKIE_NAME'])
+			resp.set_cookie(os.environ['APP_COOKIE_NAME'])
 			return resp
 		return redirect(app.config['AUTHENTICATION_LOGIN_URL'])
 
