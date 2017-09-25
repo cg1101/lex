@@ -9,24 +9,18 @@ from . import api_1_0 as bp, InvalidUsage
 
 _name = __file__.split('/')[-1].split('.')[0]
 
-@bp.route(_name + '/', methods=['GET'])
+@bp.route(_name + '/')
 @api
 # @caps()
 def get_dialects():
-	'''
-	returns a list of matched dialects
-	'''
 	dialects = m.Dialect.query.all()
 	return jsonify(dialects=m.Dialect.dump(dialects))
 
 
-@bp.route(_name + '/<int:dialectId>', methods=['GET'])
+@bp.route(_name + '/<int:dialectId>')
 @api
 # @caps()
 def get_dialect(dialectId):
-	'''
-	returns specified dialect
-	'''
 	dialect = m.Dialect.query.get(dialectId)
 	if not dialect:
 		raise InvalidUsage(_('dialect {0} not found').format(dialectId), 404)

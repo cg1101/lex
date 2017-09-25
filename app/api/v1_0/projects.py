@@ -13,9 +13,6 @@ _name = __file__.split('/')[-1].split('.')[0]
 @api
 # @caps()
 def get_projects():
-	'''
-	returns a list of matched projects
-	'''
 	projects = m.Project.query.all()
 	return jsonify(projects=m.Project.dump(projects))
 
@@ -24,9 +21,6 @@ def get_projects():
 @api
 # @caps()
 def get_project(projectId):
-	'''
-	returns specified project
-	'''
 	project = m.Project.query.get(projectId)
 	if not project:
 		raise InvalidUsage(_('project {0} not found').format(projectId), 404)

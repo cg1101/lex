@@ -13,9 +13,6 @@ _name = __file__.split('/')[-1].split('.')[0]
 @api
 # @caps()
 def get_tasks():
-	'''
-	returns a list of matched tasks
-	'''
 	tasks = m.Task.query.all()
 	return jsonify(tasks=m.Task.dump(tasks))
 
@@ -24,9 +21,6 @@ def get_tasks():
 @api
 # @caps()
 def get_task(taskId):
-	'''
-	returns specified task
-	'''
 	task = m.Task.query.get(taskId)
 	if not task:
 		raise InvalidUsage(_('task {0} not found').format(taskId), 404)

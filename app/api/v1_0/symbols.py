@@ -9,7 +9,7 @@ from . import api_1_0 as bp, InvalidUsage
 
 _name = __file__.split('/')[-1].split('.')[0]
 
-@bp.route(_name + '/', methods=['GET'])
+@bp.route(_name + '/')
 @api
 # @caps()
 def get_symbols():
