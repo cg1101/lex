@@ -9,7 +9,7 @@ from . import api_1_0 as bp, InvalidUsage
 
 _name = __file__.split('/')[-1].split('.')[0]
 
-@bp.route(_name + '/', methods=['GET'])
+@bp.route(_name + '/')
 @api
 # @caps()
 def get_projects():
@@ -20,7 +20,7 @@ def get_projects():
 	return jsonify(projects=m.Project.dump(projects))
 
 
-@bp.route(_name + '/<int:projectId>', methods=['GET'])
+@bp.route(_name + '/<int:projectId>')
 @api
 # @caps()
 def get_project(projectId):
@@ -32,3 +32,10 @@ def get_project(projectId):
 		raise InvalidUsage(_('project {0} not found').format(projectId), 404)
 	return jsonify(project=m.Project.dump(project))
 
+
+@bp.route(_name + '/<int:projectId>/tasks/')
+@api
+# @caps()
+def get_project_tasks(projectId):
+	tasks = m.Task.query.filter(m.Task.projectId==projectId).all()
+	return jsonify(tasks=m.Task.dump(tasks))

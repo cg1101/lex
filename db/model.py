@@ -292,6 +292,23 @@ class TaskSchema(Schema):
 		fields = ('taskId', 'name', 'projectId', 'taskTypeId', 'taskType',
 			'alphabetId', 'url', 'conventionsUrl', 'hasSecondHeadword')
 
+class WorkType(Base):
+	__table__ = t_subtask_type
+
+class WorkTypeSchema(Schema):
+	class Meta:
+		fields = ('workTypeId', 'name')
+
+class SubTask(Base):
+	__table__ = t_subtask
+	_workType = relationship('WorkType')
+	workType = association_proxy('_workType', 'name')
+
+class SubTaskSchema(Schema):
+	class Meta:
+		fields = ('subTaskId', 'name', 'description', 'taskId', 'workTypeId',
+			'workType', 'batchSize')
+
 class Tag(Base):
 	__table__ = t_tag
 
