@@ -61,6 +61,15 @@ t_dev__symbols = sa.Table('symbols', metadata,
 	schema='dev',
 )
 
+t_dev__users = sa.Table('users', metadata,
+	sa.Column('userid', INTEGER, primary_key=True, autoincrement=False, key=u'userId', doc=''),
+	sa.Column('emailaddress', TEXT, nullable=False, key=u'emailAddress', doc=''),
+	sa.Column('active', BOOLEAN, nullable=False, server_default=sa.text('TRUE'), key=u'isActive', doc=''),
+	sa.Column('familyname', TEXT, key=u'familyName', doc=''),
+	sa.Column('givenname', TEXT, key=u'givenName', doc=''),
+	schema='dev',
+)
+
 t_phonology_rule = sa.Table('phonology_rule', metadata,
 	sa.Column('phonology_rule_id', INTEGER, primary_key=True, key=u'ruleId', doc=''),
 	sa.Column('phonology_rule_name', TEXT, nullable=False, key=u'name', doc=''),
@@ -479,6 +488,100 @@ t_task_lexicon_export_map = sa.Table('task_lexicon_export_map', metadata,
 )
 
 
+##########################################################################
+
+# ISO 15924
+t_writing_scripts = sa.Table('writingscripts', metadata,
+	sa.Column('script_id', INTEGER, primary_key=True, autoincrement=True, key=u'scriptId', doc=''),
+	sa.Column('name', TEXT, nullable=True, key=u'name', doc=''),
+	sa.Column('code', VARCHAR(4), nullable=False, key=u'code', doc=''),
+	sa.Column('n_code', VARCHAR(3), nullable=False, key=u'numericCode', doc=''),
+	sa.UniqueConstraint(u'name'),
+	sa.UniqueConstraint(u'code'),
+	sa.UniqueConstraint(u'numericCode'),
+	schema='dev',
+)
+
+t_dialects = sa.Table('dialects', metadata,
+	sa.Column('dialect_id', INTEGER, primary_key=True, autoincrement=True, key=u'dialectId', doc=''),
+	sa.Column('name', TEXT, nullable=False, key=u'name', doc=''),
+	sa.Column('language_code', CHAR(3), nullable=False, key=u'iso639_3', doc=''),
+	sa.Column('country_code', CHAR(3), nullable=False, key=u'iso3166_3', doc=''),
+	sa.Column('script_id', INTEGER, sa.ForeignKey('writingscripts.scriptId'), nullable=False, key=u'scriptId', doc=''),
+	sa.Column('ltr', BOOLEAN, nullable=False, key=u'ltr', doc=''),
+	sa.Column('romanization_scheme', TEXT, key=u'romanizationScheme', doc=''),
+	schema='dev',
+)
+
+t_alphabets = sa.Table('alphabets', metadata,
+	sa.Column('alphabet_id', INTEGER, primary_key=True, autoincrement=True, key=u'alphabetId', doc=''),
+	sa.Column('name', TEXT, nullable=False, key=u'name', doc=''),
+	sa.Column('dialect_id', INTEGER, sa.ForeignKey('dev.dialects.dialectId'), nullable=False, key=u'dialectId', doc=''),
+	sa.Column('active', BOOLEAN, nullable=False, server_default=sa.text('TRUE'), key=u'isActive', doc=''),
+	sa.Column('manual_url', TEXT, key=u'url', doc=''),
+	sa.UniqueConstraint(u'name'),
+	schema='dev',
+)
+
+t_rules = sa.Table('rules', metadata,
+	sa.Column('rule_id', INTEGER, primary_key=True, autoincrement=True, key=u'ruleId', doc=''),
+	sa.Column('name', TEXT, nullable=False, key=u'name', doc=''),
+	sa.Column('type', TEXT, nullable=False, key=u'type', doc=''),
+	sa.Column('description', TEXT, key=u'description', doc=''),
+	sa.Column('alphabet_id', INTEGER, sa.ForeignKey('dev.alphabets.alphabetId'), nullable=False, key=u'alphabetId', doc=''),
+	sa.UniqueConstraint(u'name', u'alphabetId'),
+	sa.CheckConstraint("type=ANY(ARRAY['phonology','stress','syllabification','vowelisation'])"),
+	schema='dev',
+)
+
+t_graphemes = sa.Table('graphemes', metadata,
+	sa.Column('grapheme_id', INTEGER, primary_key=True, autoincrement=True, key=u'graphemeId', doc=''),
+	sa.Column('key', TEXT, nullable=False, key=u'key', doc=''),
+	sa.Column('alphabet_id', INTEGER, sa.ForeignKey('dev.alphabets.alphabetId'), nullable=False, key=u'alphabetId', doc=''),
+	sa.Column('token', TEXT, nullable=False, key=u'token', doc=''),
+	sa.Column('orthography', TEXT, key=u'orthography', doc=''),
+	sa.Column('romanization', TEXT, key=u'romanization', doc=''),
+	sa.Column('sample_word', TEXT, key=u'sampleWord', doc=''),
+	sa.Column('sample_transcription', TEXT, key=u'sampleTranscription', doc=''),
+	sa.Column('sample_romanization', TEXT, key=u'sampleRomanization', doc=''),
+	sa.UniqueConstraint(u'alphabetId', u'key'),
+	sa.UniqueConstraint(u'alphabetId', u'token'),
+	schema='dev',
+)
+
+
+t_rawpieces = sa.Table('rawpieces', metadata,
+	sa.Column(u'rawpieceid', INTEGER, primary_key=True, nullable=False, key=u'rawPieceId', doc=''),
+	sa.Column(u'taskid', INTEGER, nullable=False, key=u'taskId', doc=''),
+	sa.Column(u'rawtext', TEXT, key=u'rawText', doc=''),
+	sa.Column(u'assemblycontext', TEXT, nullable=False, key=u'assemblyContext', doc=''),
+	sa.Column(u'allocationcontext', TEXT, nullable=False, key=u'allocationContext', doc=''),
+	sa.Column(u'meta', TEXT, key=u'meta', doc=''),
+	sa.Column(u'isnew', BOOLEAN, nullable=False, server_default=sa.text(u'true'), key=u'isNew', doc=''),
+	sa.Column(u'hypothesis', TEXT, key=u'hypothesis', doc=''),
+	sa.Column(u'words', INTEGER, server_default=sa.text(u'0'), key=u'words', doc=''),
+	sa.Column(u'groupid', INTEGER, key=u'groupId', doc=''),
+	sa.Column(u'loadid', INTEGER, key=u'loadId', doc=''),
+	sa.UniqueConstraint(u'taskId', u'assemblyContext'),
+	# sa.ForeignKeyConstraint([u'taskId'], [u'tasks.taskId']),
+	# sa.ForeignKeyConstraint([u'groupId'], [u'postprocessingutterancegroups.groupId']),
+	# sa.ForeignKeyConstraint([u'taskId', u'loadId'], [u'loads.taskId', u'loads.loadId']),
+	schema='dev',
+)
+
+
+t_loads = sa.Table('loads', metadata,
+	sa.Column(u'loadid', INTEGER, primary_key=True, nullable=False, key=u'loadId', doc=''),
+	sa.Column(u'createdby', INTEGER, nullable=False, key=u'createdBy', doc=''),
+	sa.Column(u'createdat', TIMESTAMP(timezone=True), nullable=False, server_default=sa.text(u'now()'), key=u'createdAt', doc=''),
+	sa.Column(u'taskid', INTEGER, nullable=False, key=u'taskId', doc=''),
+	# sa.ForeignKeyConstraint([u'createdBy'], [u'users.userId']),
+	# sa.ForeignKeyConstraint([u'taskId'], [u'tasks.taskId']),
+)
+# Index('ix_loads_taskid_loadid', t_loads.c.loadId, t_loads.c.taskId, unique=True)
+
+
+##########################################################################
 
 __all__ = [name for name in locals().keys()
 		if name.startswith('t_') or name.startswith('j_')]

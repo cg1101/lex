@@ -207,8 +207,11 @@ class StressRule(Base):
 		return 'stress'
 
 class StressRuleSchema(Schema):
+	sequences = fields.Method('get_sequences')
+	def get_sequences(self, obj):
+		return [dict(sequenceId=obj.ruleId, correct=obj.sequence)]
 	class Meta:
-		fields = ('ruleId', 'type', 'name', 'description', 'alphabetId', 'sequence')
+		fields = ('ruleId', 'type', 'name', 'description', 'alphabetId', 'sequences')
 
 # SyllabificationRule
 class SyllabificationRule(Base):
@@ -225,7 +228,6 @@ class SyllabificationRuleSchema(Schema):
 	sequences = fields.Nested('SyllabificationRuleSequenceSchema', many=True, exclude=('ruleId',))
 	class Meta:
 		fields = ('ruleId', 'type', 'name', 'description', 'alphabetId', 'sequences')
-
 
 class SyllabificationRuleSequence(Base):
 	__table__ = t_syllabification_rule_sequence
@@ -253,7 +255,6 @@ class VowelisationRuleSequence(Base):
 class VowelisationRuleSequenceSchema(Schema):
 	class Meta:
 		fields = ('ruleId', 'sequenceId', 'correct', 'incorrect')
-
 
 class User(Base):
 	__table__ = t_users
@@ -345,6 +346,19 @@ class Vowel(Base):
 class Word(Base):
 	__table__ = t_word
 
+class RawPiece(Base):
+	__table__ = t_rawpieces
+
+class RawPieceSchema(Schema):
+	class Meta:
+		fields = ('rawPieceId', 'rawText', 'hypothesis', 'words',
+			'assemblyContext', 'allocationContext', 'loadId')
+class Load(Base):
+	__table__ = t_loads
+
+class LoadSchema(Schema):
+	class Meta:
+		fields = ('loadId', 'createdAt', 'createdBy', 'taskId')
 
 ##########################################################################
 #
