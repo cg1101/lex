@@ -577,6 +577,7 @@ t_loads = sa.Table('loads', metadata,
 	sa.Column(u'taskid', INTEGER, nullable=False, key=u'taskId', doc=''),
 	# sa.ForeignKeyConstraint([u'createdBy'], [u'users.userId']),
 	# sa.ForeignKeyConstraint([u'taskId'], [u'tasks.taskId']),
+	schema='dev',
 )
 # Index('ix_loads_taskid_loadid', t_loads.c.loadId, t_loads.c.taskId, unique=True)
 
