@@ -1,7 +1,7 @@
 Flask-Cors==3.0.3
 Flask-Migrate==2.1.1
 Flask-Script==2.0.6
-Flask-SQLAlchemy==2.2
+Flask-SQLAlchemy==2.5.1
 Marshmallow==2.13.6
 psycopg2==2.8.6
 pycrypto==2.6.1
